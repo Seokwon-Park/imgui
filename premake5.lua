@@ -2,7 +2,7 @@ project "ImGui"
 	kind "StaticLib"
 	language "C++"
     cppdialect "C++20"
-    staticruntime "on"
+    staticruntime "off"
 
 	targetdir ("Build/Bin/%{cfg.buildcfg}/%{prj.name}")
 	objdir ("Build/Intermediate/%{cfg.buildcfg}/%{prj.name}")
