@@ -1537,6 +1537,7 @@ ImGuiStyle::ImGuiStyle()
     ColorButtonPosition         = ImGuiDir_Right;   // Side of the color button in the ColorEdit4 widget (left/right). Defaults to ImGuiDir_Right.
     ButtonTextAlign             = ImVec2(0.5f,0.5f);// Alignment of button text when button is larger than text.
     SelectableTextAlign         = ImVec2(0.0f,0.0f);// Alignment of selectable text. Defaults to (0.0f, 0.0f) (top-left aligned). It's generally important to keep this left-aligned if you want to lay multiple items on a same line.
+    InputTextCursorSize         = 1.0f;             // Thickness of cursor/caret in InputText().
     SeparatorSize               = 1.0f;             // Thickness of border in Separator().
     SeparatorTextBorderSize     = 3.0f;             // Thickness of border in SeparatorText().
     SeparatorTextAlign          = ImVec2(0.0f,0.5f);// Alignment of text within the separator. Defaults to (0.0f, 0.5f) (left aligned, center).
@@ -1612,6 +1613,7 @@ void ImGuiStyle::ScaleAllSizes(float scale_factor)
     DragDropTargetBorderSize = ImTrunc(DragDropTargetBorderSize * scale_factor);
     DragDropTargetPadding = ImTrunc(DragDropTargetPadding * scale_factor);
     ColorMarkerSize = ImTrunc(ColorMarkerSize * scale_factor);
+    InputTextCursorSize = ImTrunc(InputTextCursorSize * scale_factor);
     SeparatorSize = ImTrunc(SeparatorSize * scale_factor);
     SeparatorTextBorderSize = ImTrunc(SeparatorTextBorderSize * scale_factor);
     SeparatorTextPadding = ImTrunc(SeparatorTextPadding * scale_factor);
@@ -6318,11 +6320,12 @@ bool ImGui::IsItemToggledOpen()
     return (g.LastItemData.StatusFlags & ImGuiItemStatusFlags_ToggledOpen) ? true : false;
 }
 
-// Call after a Selectable() or TreeNode() involved in multi-selection.
-// Useful if you need the per-item information before reaching EndMultiSelect(), e.g. for rendering purpose.
-// This is only meant to be called inside a BeginMultiSelect()/EndMultiSelect() block.
-// (Outside of multi-select, it would be misleading/ambiguous to report this signal, as widgets
-// return e.g. a pressed event and user code is in charge of altering selection in ways we cannot predict.)
+// Call after a Selectable() or TreeNode() items inside a BeginMultiSelect()/EndMultiSelect() scope.
+// - Useful if you need the per-item information before reaching EndMultiSelect(), e.g. for rendering purpose.
+// Outside of a multi-select block:
+// - It would be misleading/ambiguous to report this signal, as widgets return e.g. a pressed event,
+//   and user code is in charge of altering selection in ways we cannot predict.
+//   Prefer using 'if (IsItemClicked() && !IsItemToggledOpen())' for a manual reimplementation of selection.
 bool ImGui::IsItemToggledSelection()
 {
     ImGuiContext& g = *GImGui;
